@@ -1,0 +1,362 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[indonesian]{babel}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{tcolorbox} % Untuk membuat kotak biru pada judul
+\usepackage{array}     % Untuk merapikan tabel data mahasiswa
+
+% --- KONFIGURASI GEOMETRY ---
+\geometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
+
+% --- DEFINISI WARNA (Sesuai Permintaan Cover) ---
+\definecolor{codegreen}{rgb}{0, 0.6, 0}
+\definecolor{boxblue}{RGB}{235, 245, 255}
+\definecolor{borderblue}{RGB}{0, 51, 102}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+% --- DEFINISI BAHASA RUST UNTUK LISTINGS ---
+\lstdefinelanguage{Rust}{
+  morekeywords={break,continue,else,for,if,in,loop,match,return,while,as,box,const,enum,extern,fn,impl,let,mod,move,mut,pub,ref,Self,self,static,struct,trait,type,unsafe,use,where,crate,false,true},
+  otherkeywords={!,::},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+}
+% Pengaturan style kodingan yang kamu panggil (ruststyle)
+\lstdefinestyle{ruststyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    language=Rust
+}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\begin{document}
+
+% ============================================================================
+% COVER PAGE (Sesuai Permintaan)
+% ============================================================================
+\begin{titlepage}
+    \centering
+    
+    % Judul Utama
+    {\LARGE \textbf{EVALUASI TENGAH SEMESTER}} \\[0.2cm]
+    {\LARGE \textbf{(ETS)}} \\[0.5cm]
+    
+    {\Large \textbf{Algoritma dan Pemrograman}} \\[0.8cm]
+    
+    {\large Program Studi Teknik Instrumentasi} \\[0.2cm]
+    {\large Semester Genap 2025/2026} \\[1.5cm]
+    
+    % Kotak Judul Project (PBL)
+    \begin{tcolorbox}[
+        colback=boxblue, 
+        colframe=borderblue, 
+        width=0.9\textwidth, 
+        arc=5pt, 
+        boxrule=1pt,
+        center title,
+        halign=center
+    ]
+        \centering
+        \textbf{\large PROJECT BASED LEARNING (PBL)} \\[0.3cm]
+        \textbf{Tank Level Monitering System untuk Manajemen Air Gedung \\ Berbasis Rust}
+    \end{tcolorbox}
+    
+    \vfill 
+    
+    % Detail Pengampu dan Waktu
+    \begin{flushleft}
+    \hspace{2.5cm} 
+    \begin{tabular}{ll}
+        \textbf{Dosen Pengampu}  & : Ahmad Radhy, S.Si., M.Si. \\
+        \textbf{Durasi Pengerjaan} & : 1 Pekan \\
+        \textbf{Bahasa Pemrograman} & : Rust \\
+        \textbf{Metode Penilaian}  & : Project + Ujian Lisan \\
+    \end{tabular}
+    \end{flushleft}
+    
+    \vspace{1.5cm}
+    
+    % Data Mahasiswa
+    \begin{flushleft}
+    \hspace{2.5cm}
+    \begin{tabular}{ll}
+        \textbf{Kelompok :} &  \\[0.3cm] 
+        \textbf{Mahasiswa 1 :} & Muflih Azhar \\[0.1cm]
+        \textbf{NRP :} & 2042251079 \\[0.3cm]
+        \textbf{Mahasiswa 2 :} & M. Nafis Abdul Majid \\[0.1cm]
+        \textbf{NRP :} & 2042251126 \\
+    \end{tabular}
+    \end{flushleft}
+    
+    \vfill
+    
+    {\large Departemen Teknik Instrumentasi} \\[0.1cm]
+    {\large Institut Teknologi Sepuluh Nopember} \\[1cm]
+    
+    \textbf{1} 
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================================
+% ISI LAPORAN
+% ============================================================================
+
+\section{Pendahuluan}
+Sistem penyediaan air pada gedung-gedung besar sering kali menghadapi kendala dalam akurasi pemantauan level air, yang jika dilakukan secara manual dapat menyebabkan pemborosan energi atau keterlambatan pengisian. Proyek ini merancang sistem monitoring level tangki otomatis berbasis terminal menggunakan bahasa pemrograman Rust. Fokus utama sistem ini adalah menjaga kestabilan data melalui filter digital dan memastikan akurasi melalui tahap kalibrasi mandiri sebelum mengaktifkan pompa.
+
+\section{Studi Kasus Instrumentasi}
+Proyek ini mengambil studi kasus sistem monitoring tandon air dengan parameter desain sebagai berikut:
+\begin{itemize}
+    \item \textbf{Objek Ukur}: Tangki silinder dengan jari-jari ($r$) sebesar 2.0 meter.
+    \item \textbf{Batas Ambang}: Batas Bawah (\textit{Low Level}) ditetapkan pada 2.0 meter untuk memicu pompa nyala, dan Batas Atas (\textit{High-High}) pada 9.0 meter untuk mematikan pompa.
+    \item \textbf{Kompensasi Galat}: Sensor diasumsikan memiliki galat sistematis sebesar 0.5 meter yang dikoreksi melalui perangkat lunak.
+\end{itemize}
+
+\section{Algoritma dan Flowchart}
+Algoritma sistem berjalan secara interaktif sebagai berikut[:
+\begin{enumerate}
+    \item Menerima input pembacaan sensor mentah (\textit{raw data}) dari pengguna melalui terminal.
+    \item Melakukan perhitungan \textit{Simple Moving Average} (SMA) menggunakan 3 data terakhir untuk mereduksi noise.
+    \item Melakukan kalibrasi dengan menjumlahkan hasil rata-rata dengan nilai galat (0.5m) untuk mendapatkan ketinggian final.
+    \item Menghitung volume air aktual menggunakan rumus geometri silinder.
+    \item Melakukan pengambilan keputusan (\textit{decision making}) status pompa berdasarkan ambang batas LL dan HH.
+\end{enumerate}
+    \begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.8cm, 
+        auto,
+        startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=0.8cm, text centered, draw=black, fill=red!20},
+        io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=0.8cm, text centered, draw=black, fill=blue!15},
+        process/.style={rectangle, minimum width=3.5cm, minimum height=0.8cm, text centered, draw=black, fill=orange!15},
+        decision/.style={diamond, aspect=2, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!15},
+        arrow/.style={thick,->,>=stealth}
+    ]
+
+    % Nodes
+    \node (start) [startstop] {Mulai};
+    \node (in1)   [io, below of=start] {Input Raw Level};
+    \node (pro1)  [process, below of=in1] {Moving Average \& Kalibrasi};
+    \node (dec1)  [decision, below of=pro1, yshift=-0.5cm] {Level $\le$ LL?};
+    
+    % Jalur kanan untuk aksi
+    \node (pmp1)  [process, right of=dec1, xshift=3.5cm] {Pompa NYALA};
+    \node (dec2)  [decision, below of=dec1, yshift=-1.5cm] {Level $\ge$ HH?};
+    \node (pmp2)  [process, right of=dec2, xshift=3.5cm] {Pompa MATI};
+    
+    % Jalur bawah untuk normal
+    \node (norm)  [process, below of=dec2, yshift=-0.5cm] {Pompa STANDBY};
+    \node (out)   [io, below of=norm] {Output Terminal};
+
+    % Arrows
+    \draw [arrow] (start) -- (in1);
+    \draw [arrow] (in1) -- (pro1);
+    \draw [arrow] (pro1) -- (dec1);
+    
+    \draw [arrow] (dec1) -- node[anchor=south] {Ya} (pmp1);
+    \draw [arrow] (dec1) -- node[anchor=east] {Tidak} (dec2);
+    
+    \draw [arrow] (dec2) -- node[anchor=south] {Ya} (pmp2);
+    \draw [arrow] (dec2) -- node[anchor=east] {Tidak} (norm);
+    
+    \draw [arrow] (pmp1) |- (out);
+    \draw [arrow] (pmp2) |- (out);
+    \draw [arrow] (norm) -- (out);
+    
+    % Feedback Loop (Garis kembali ke Input)
+    \draw [arrow] (out.west) -- ++(-1.5,0) |- (in1.west);
+
+    \end{tikzpicture}
+    \caption{Alur Logika Sistem Kendali Level Tangki Interaktif}
+\end{figure}
+
+\section{Konsep Pemrograman Berbasis Objek (OOP)}
+Implementasi OOP pada program ini menggunakan \texttt{struct} \textbf{TankSystem}. Seluruh variabel penting (kapasitas, tinggi, error) dibungkus (enkapsulasi) dalam satu struktur data. Fungsi-fungsi terkait operasi tangki dijadikan sebagai \texttt{method} dalam blok \texttt{impl}, sehingga memudahkan pemanggilan fungsi yang terpusat pada objek tangki tersebut.
+
+\section{Implementasi Komputasi Numerik}
+Dua metode numerik utama diterapkan dalam sistem ini:
+\begin{enumerate}
+    \item \textbf{Moving Average}: Menghitung rata-rata dari $n=3$ data terakhir untuk stabilitas pembacaan.
+    \begin{equation}
+        h_{avg} = \frac{h_i + h_{i-1} + h_{i-2}}{3}
+    \end{equation}
+    \item \textbf{Kalibrasi Mandiri}: Menyesuaikan nilai rata-rata dengan galat sistematis.
+    \begin{equation}
+        h_{final} = h_{avg} + \text{error}
+    \end{equation}
+    \item \textbf{Perhitungan Geometri Silinder}: Menghitung volume air aktual ($V$) di dalam tandon berbentuk silinder berdasarkan nilai ketinggian yang telah diproses ($h_{final}$) dengan parameter jari-jari tangki ($r$) sebesar 2.0 meter.
+    \begin{equation}
+        V = \pi \cdot r^2 \cdot h_{final}
+    \end{equation}
+\end{enumerate}
+
+\section{Penjelasan Program Rust}
+Kode berikut dirancang untuk berjalan di terminal secara interaktif:
+
+\begin{lstlisting}[style=ruststyle, caption=Implementasi Sistem Monitoring Sensor dan Kendali Pompa Interaktif dengan Rust]
+use std::io::{self, Write}; 
+
+struct Sensor {
+    name: String,
+    readings: Vec<f32>,
+    window_size: usize,
+    calibration_error: f32,
+}
+
+impl Sensor {
+    fn new(name: &str, window_size: usize, error: f32) -> Self {
+        Self {
+            name: name.to_string(),
+            readings: Vec::new(),
+            window_size,
+            calibration_error: error,
+        }
+    }
+
+    fn moving_average(&mut self, new_value: f32) -> f32 {
+        self.readings.push(new_value);
+        if self.readings.len() > self.window_size {
+            self.readings.remove(0);
+        }
+        let sum: f32 = self.readings.iter().sum();
+        sum / self.readings.len() as f32
+    }
+
+    fn calibrate(&self, value: f32) -> f32 {
+        value + self.calibration_error
+    }
+    
+    fn get_processed_level(&mut self, raw_value: f32) -> f32 {
+        let averaged = self.moving_average(raw_value);
+        self.calibrate(averaged)
+    }
+}
+
+struct MonitoringSystem {
+    sensor: Sensor,
+    low_limit: f32,
+    high_limit: f32,
+}
+
+impl MonitoringSystem {
+    fn new(ll: f32, hh: f32, err: f32) -> Self {
+        Self {
+            sensor: Sensor::new("Water Level", 3, err),
+            low_limit: ll,
+            high_limit: hh,
+        }
+    }
+
+    fn calculate_volume(&self, height: f32) -> f32 {
+        let radius: f32 = 2.0; 
+        let pi = 3.14159;
+        pi * radius * radius * height
+    }
+
+    fn run_process(&mut self, raw_val: f32) {
+        let processed = self.sensor.get_processed_level(raw_val);
+        let volume = self.calculate_volume(processed);
+        
+        let status_pompa = if processed <= self.low_limit {
+            "NYALA [>>>>] - Mengisi air"
+        } else if processed >= self.high_limit {
+            "MATI  [____] - Tangki penuh"
+        } else {
+            "STANDBY [----]"
+        };
+
+        println!("--------------------------------------------------");
+        println!("DATA SENSOR  | Raw: {:.2}m | Final: {:.2}m", raw_val, processed);
+        println!("VOLUME AIR   | {:.2} m3", volume);
+        println!("STATUS POMPA | {}", status_pompa);
+    }
+}
+
+fn main() {
+    let mut system = MonitoringSystem::new(2.0, 9.0, 0.5); 
+    
+    println!("=== SISTEM MONITORING TANGKI INTERAKTIF ===");
+    println!("Batas Bawah: {}m | Batas Atas: {}m", system.low_limit, system.high_limit);
+    println!("Ketik 'exit' untuk berhenti.\n");
+
+    loop {
+        print!("Masukkan pembacaan sensor (meter): ");
+        io::stdout().flush().unwrap();
+
+        let mut input_text = String::new();
+        io::stdin()
+            .read_line(&mut input_text)
+            .expect("Gagal membaca input");
+
+        let trimmed = input_text.trim();
+        if trimmed == "exit" {
+            println!("Program berhenti. Sampai jumpa!");
+            break;
+        }
+
+        match trimmed.parse::<f32>() {
+            Ok(val) => {
+                system.run_process(val);
+                println!("--------------------------------------------------\n");
+            }
+            Err(_) => {
+                println!("Input tidak valid! Harap masukkan angka.\n");
+            }
+        };
+    }
+}
+\end{lstlisting}
+
+\section{Hasil Pengujian}
+Pengujian dilakukan dengan simulasi data input melalui terminal secara berurutan:
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|l|}
+\hline
+\textbf{No} & \textbf{Input Average} & \textbf{Ketinggian Final} & \textbf{Volume ($m^3$)} & \textbf{Status Pompa} \\ \hline
+1 & 1.50 m & 2.00 m & 25.13 & NYALA (LL Tercapai) \\ \hline
+2 & 5.00 m & 5.50 m & 69.12 & STANDBY \\ \hline
+3 & 8.50 m & 9.00 m & 113.10 & MATI (HH Tercapai) \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Analisis Hasil}
+Berdasarkan hasil pengujian, sistem menunjukkan stabilitas yang baik berkat penggunaan jendela rata-rata 3 data. Kalibrasi penambahan 0.5 meter efektif dalam mengimbangi deviasi sensor sehingga pompa aktif tepat pada batas fisik LL 2.0 meter. Perhitungan volume silinder memberikan informasi tambahan yang krusial bagi operator untuk memantau kapasitas tersedia secara presisi
+
+\section{Kesimpulan}
+Sistem monitoring level tangki interaktif ini berhasil memenuhi standar evaluasi dengan mengintegrasikan konsep OOP, algoritma kendali, dan komputasi numerik dalam bahasa Rust. Penggunaan filter \textit{Moving Average} dan kalibrasi mandiri terbukti meningkatkan keandalan sistem dalam mendeteksi batas kritis LL dan HH secara akurat.
+
+\end{document}
